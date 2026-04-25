@@ -1,0 +1,273 @@
+{
+  "Keflavik International Airport Iceland": {
+    "lat": 63.9850119,
+    "lng": -22.6266959,
+    "displayName": "Keflavík International Airport, Suðurnesjabær, Southern Peninsula, 235, Iceland",
+    "provider": "nominatim"
+  },
+  "Hallgrimskirkja Reykjavik Iceland": {
+    "lat": 64.1417951,
+    "lng": -21.9267103,
+    "displayName": "Hallgrímskirkja, 1, Hallgrímstorg, Tungan, Miðborg, Reykjavik, Capital Region, 101, Iceland",
+    "provider": "nominatim"
+  },
+  "Sun Voyager, Reykjavik, Iceland": {
+    "lat": 64.147607,
+    "lng": -21.9222615,
+    "displayName": "Sun Voyager, Mánaleið, Austurbær, Miðborg, Reykjavik, Capital Region, 101, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Sun Voyager, Reykjavik, Iceland"
+  },
+  "Harpa, Reykjavik, Iceland": {
+    "lat": 64.1504326,
+    "lng": -21.9328535,
+    "displayName": "Harpa, 2, Austurbakki, Miðborg, Reykjavik, Capital Region, 101, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Harpa, Reykjavik, Iceland"
+  },
+  "Tjörnin, Reykjavík, Iceland": {
+    "lat": 64.1445218,
+    "lng": -21.942337,
+    "displayName": "Tjörnin, Miðborg, Reykjavik, Capital Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Tjörnin, Reykjavík, Iceland"
+  },
+  "Laugavegur, Reykjavík, Iceland": {
+    "lat": 64.144279,
+    "lng": -21.9220745,
+    "displayName": "Laugavegur, Austurbær, Miðborg, Reykjavik, Capital Region, 101, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Laugavegur, Reykjavík, Iceland"
+  },
+  "Icelandic Phallological Museum, Reykjavík, Iceland": {
+    "lat": 64.1484683,
+    "lng": -21.9357603,
+    "displayName": "The Icelandic Phallological Museum, 2, Geirsgata, Miðbær, Miðborg, Reykjavik, Capital Region, 101, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Icelandic Phallological Museum, Reykjavík, Iceland"
+  },
+  "Thingvellir National Park, Iceland": {
+    "lat": 64.2786081,
+    "lng": -21.0819412,
+    "displayName": "Þingvellir National Park, Bláskógabyggð, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Thingvellir National Park, Iceland"
+  },
+  "Kerið, Iceland": {
+    "lat": 64.0409591,
+    "lng": -20.884611,
+    "displayName": "Kerid, Grímsnes- og Grafningshreppur, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Kerið, Iceland"
+  },
+  "Strokkur, Iceland": {
+    "lat": 64.3126964,
+    "lng": -20.3007733,
+    "displayName": "Strokkur, Biskupstungnabraut, Bláskógabyggð, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Strokkur, Iceland"
+  },
+  "Gullfoss, Iceland": {
+    "lat": 64.327316,
+    "lng": -20.1191026,
+    "displayName": "Gullfoss, Gullfossvegur, Bláskógabyggð, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Gullfoss, Iceland"
+  },
+  "Reykjadalur, Iceland": {
+    "lat": 64.1662703,
+    "lng": -20.2645082,
+    "displayName": "Reykjadalur, Hrunamannahreppur, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Reykjadalur, Iceland"
+  },
+  "Seljalandsfoss, Iceland": {
+    "lat": 63.6154571,
+    "lng": -19.9881686,
+    "displayName": "Seljalandsfoss, Rangárþing eystra, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Seljalandsfoss, Iceland"
+  },
+  "Gljúfrabúi, Iceland": {
+    "lat": 63.6207562,
+    "lng": -19.9863395,
+    "displayName": "Gljufrabui, Hamragarðar, Rangárþing eystra, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Gljúfrabúi, Iceland"
+  },
+  "Skógafoss, Iceland": {
+    "lat": 63.5321038,
+    "lng": -19.511292,
+    "displayName": "Skogafoss, Rangárþing eystra, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Skógafoss, Iceland"
+  },
+  "Dyrhólaey, Iceland": {
+    "lat": 63.3988334,
+    "lng": -19.1266314,
+    "displayName": "Dyrhólaey, Mýrdalshreppur, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Dyrhólaey, Iceland"
+  },
+  "Reynisfjara, Iceland": {
+    "lat": 63.4044262,
+    "lng": -19.0587987,
+    "displayName": "Reynisfjara Beach, Vik, Mýrdalshreppur, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Reynisfjara, Iceland"
+  },
+  "Fjaðrárgljúfur, Iceland": {
+    "lat": 63.7725995,
+    "lng": -18.1737214,
+    "displayName": "Fjaðrárgljúfur, Holt, Skaftárhreppur, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Fjaðrárgljúfur, Iceland"
+  },
+  "Svartifoss, Iceland": {
+    "lat": 64.0276799,
+    "lng": -16.9752562,
+    "displayName": "Svartifoss, Kvarnarkofalág, Sveitarfélagið Hornafjörður, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Svartifoss, Iceland"
+  },
+  "Jökulsárlón, Iceland": {
+    "lat": 64.0783208,
+    "lng": -16.2274213,
+    "displayName": "Glacier Lagoon, Sveitarfélagið Hornafjörður, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Jökulsárlón, Iceland"
+  },
+  "Diamond Beach, Iceland": {
+    "lat": 64.0413253,
+    "lng": -16.182552,
+    "displayName": "Diamond Beach, Sveitarfélagið Hornafjörður, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Diamond Beach, Iceland"
+  },
+  "Stokksnes, Iceland": {
+    "lat": 64.243669,
+    "lng": -14.9674252,
+    "displayName": "Stokksnes, Sveitarfélagið Hornafjörður, Southern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Stokksnes, Iceland"
+  },
+  "Djúpivogur, Iceland": {
+    "lat": 64.6430303,
+    "lng": -14.2775558,
+    "displayName": "Djúpivogur Airport, Hammersminni, Djúpivogur, Múlaþing, Eastern Region, 765, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Djúpivogur, Iceland"
+  },
+  "Vök Baths, Iceland": {
+    "lat": 65.3030657,
+    "lng": -14.447475,
+    "displayName": "Vök Baths, Hróarstunguvegur, Egilsstaðir, Múlaþing, Eastern Region, 701, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Vök Baths, Iceland"
+  },
+  "Egilsstaðir, Iceland": {
+    "lat": 65.2620412,
+    "lng": -14.4035258,
+    "displayName": "Egilsstaðir, Múlaþing, Eastern Region, 700, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Egilsstaðir, Iceland"
+  },
+  "Stuðlagil, Iceland": {
+    "lat": 65.1623267,
+    "lng": -15.3081247,
+    "displayName": "Stuðlagil canyon, Grund, Múlaþing, Eastern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Stuðlagil, Iceland"
+  },
+  "Dettifoss, Iceland": {
+    "lat": 65.8143005,
+    "lng": -16.384395,
+    "displayName": "Dettifoss, Dettifossvegur eystri, Norðurþing, Northeastern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Dettifoss, Iceland"
+  },
+  "Selfoss, Iceland": {
+    "lat": 63.9368093,
+    "lng": -21.0035319,
+    "displayName": "Selfoss, Sveitarfélagið Árborg, Southern Region, 800, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Selfoss, Iceland"
+  },
+  "Grjótagjá, Iceland": {
+    "lat": 65.6264141,
+    "lng": -16.8829708,
+    "displayName": "Grjótagjá, Grjótagjárvegur, Reykjahlíð, Þingeyjarsveit, Northeastern Region, 660, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Grjótagjá, Iceland"
+  },
+  "Dimmuborgir, Iceland": {
+    "lat": 65.5880547,
+    "lng": -16.9079361,
+    "displayName": "Dimmuborgir, Þingeyjarsveit, Northeastern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Dimmuborgir, Iceland"
+  },
+  "Hverir, Iceland": {
+    "lat": 65.6411434,
+    "lng": -16.809182,
+    "displayName": "Hverir - Boiling Mud, Þingeyjarsveit, Northeastern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Hverir, Iceland"
+  },
+  "Mývatn Nature Baths, Iceland": {
+    "lat": 65.6303953,
+    "lng": -16.848336,
+    "displayName": "Myvatn Nature Baths, 8815, Þingeyjarsveit, Northeastern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Mývatn Nature Baths, Iceland"
+  },
+  "Goðafoss, Iceland": {
+    "lat": 65.6828162,
+    "lng": -17.550624,
+    "displayName": "Godafoss Waterfall, Norðurlandsvegur, Þingeyjarsveit, Northeastern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Goðafoss, Iceland"
+  },
+  "Akureyri, Iceland": {
+    "lat": 65.6826364,
+    "lng": -18.0912993,
+    "displayName": "Akureyri, Akureyrarbær, Northeastern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Akureyri, Iceland"
+  },
+  "Reykjavík, Iceland": {
+    "lat": 64.145981,
+    "lng": -21.9422367,
+    "displayName": "Reykjavik, Capital Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Reykjavík, Iceland"
+  },
+  "Keflavik International Airport, Iceland": {
+    "lat": 63.9850119,
+    "lng": -22.6266959,
+    "displayName": "Keflavík International Airport, Suðurnesjabær, Southern Peninsula, 235, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Keflavik International Airport, Iceland"
+  },
+  "Blue Lagoon, Iceland": {
+    "lat": 63.8791684,
+    "lng": -22.4443196,
+    "displayName": "Blue Lagoon, Grindavík, Grindavíkurbær, Southern Peninsula, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Blue Lagoon, Iceland"
+  },
+  "Reykjadalur, Hveragerði, Iceland": {
+    "lat": 64.0211558,
+    "lng": -21.2111595,
+    "displayName": "Reykjadalur, Árhólmar, Hveragerðisbær, Southern Region, 810, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Reykjadalur, Hveragerði, Iceland"
+  },
+  "Dettifoss Selfoss Iceland": {
+    "lat": 65.8219303,
+    "lng": -16.3859094,
+    "displayName": "Dettifoss, Selfoss og Hafragilsfoss, Norðurþing, Northeastern Region, Iceland",
+    "provider": "nominatim",
+    "queryUsed": "Dettifoss Selfoss Iceland"
+  }
+}
