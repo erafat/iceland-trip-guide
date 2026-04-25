@@ -51,6 +51,10 @@
 
     <main class="content-grid">
       <section class="map-panel">
+        <div class="map-tools" aria-label="Map tools">
+          <button id="locate-me" class="map-gps-button" type="button">Use GPS</button>
+          <p id="location-status" class="location-status" aria-live="polite">Tap Use GPS to show your location on the map.</p>
+        </div>
         <div id="map" class="map-frame" aria-label="Map of itinerary stops"></div>
         <div id="hover-card" class="hover-card is-hidden" aria-live="polite"></div>
       </section>

@@ -34,6 +34,9 @@ const state = {
   routeLayers: [],
   map: null,
   hoveredStayDay: null,
+  locationStatus: "idle",
+  userLocationMarker: null,
+  userLocationAccuracyCircle: null,
   weather: {
     generatedAt: null,
     source: null,
@@ -50,6 +53,8 @@ const dayFiltersElement = document.querySelector("#day-filters");
 const dayGroupsElement = document.querySelector("#day-groups");
 const stayCountElement = document.querySelector("#stay-count");
 const weatherStatusElement = document.querySelector("#weather-status");
+const locateMeButton = document.querySelector("#locate-me");
+const locationStatusElement = document.querySelector("#location-status");
 
 const monthLabels = [
   "January",
@@ -97,6 +102,10 @@ function escapeHtml(text) {
 
 function supportsHover() {
   return window.matchMedia("(hover: hover)").matches;
+}
+
+function browserSupportsGeolocation() {
+  return typeof navigator !== "undefined" && "geolocation" in navigator;
 }
 
 function decodePolyline6(encoded) {
@@ -332,6 +341,120 @@ function markerHtml(stay) {
       </div>
     </div>
   `;
+}
+
+function userLocationMarkerIcon() {
+  return L.divIcon({
+    html: `
+      <div class="gps-marker">
+        <span class="gps-marker-pulse"></span>
+        <span class="gps-marker-core"></span>
+      </div>
+    `,
+    className: "gps-marker-icon",
+    iconSize: [22, 22],
+    iconAnchor: [11, 11]
+  });
+}
+
+function setLocationStatus(message, tone = "neutral") {
+  locationStatusElement.textContent = message;
+  locationStatusElement.dataset.tone = tone;
+}
+
+function syncLocateButton() {
+  if (!browserSupportsGeolocation()) {
+    locateMeButton.disabled = true;
+    locateMeButton.textContent = "GPS unavailable";
+    setLocationStatus("This browser does not support location sharing.", "muted");
+    return;
+  }
+
+  locateMeButton.disabled = state.locationStatus === "loading";
+  locateMeButton.textContent = state.userLocationMarker ? "Refresh GPS" : "Use GPS";
+}
+
+function renderUserLocation(position, panToLocation = true) {
+  const latLng = [position.coords.latitude, position.coords.longitude];
+  const accuracyMeters = Math.max(Math.round(position.coords.accuracy || 0), 20);
+
+  if (!state.userLocationMarker) {
+    state.userLocationMarker = L.marker(latLng, {
+      icon: userLocationMarkerIcon(),
+      zIndexOffset: 1000,
+      title: "Your current location"
+    }).addTo(state.map);
+  } else {
+    state.userLocationMarker.setLatLng(latLng);
+  }
+
+  if (!state.userLocationAccuracyCircle) {
+    state.userLocationAccuracyCircle = L.circle(latLng, {
+      radius: accuracyMeters,
+      color: "#2d6775",
+      weight: 1.5,
+      opacity: 0.38,
+      fillColor: "#2d6775",
+      fillOpacity: 0.12
+    }).addTo(state.map);
+  } else {
+    state.userLocationAccuracyCircle.setLatLng(latLng);
+    state.userLocationAccuracyCircle.setRadius(accuracyMeters);
+  }
+
+  if (panToLocation) {
+    state.map.flyTo(latLng, Math.max(state.map.getZoom(), 9), {
+      animate: true,
+      duration: 0.8
+    });
+  }
+
+  state.locationStatus = "ready";
+  syncLocateButton();
+  setLocationStatus(`GPS locked. Blue marker shows your current position (about +/- ${accuracyMeters} m).`, "success");
+}
+
+function requestUserLocation() {
+  if (!browserSupportsGeolocation()) {
+    syncLocateButton();
+    return;
+  }
+
+  state.locationStatus = "loading";
+  syncLocateButton();
+  setLocationStatus("Requesting GPS location from this device...", "neutral");
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      renderUserLocation(position, true);
+    },
+    (error) => {
+      state.locationStatus = "error";
+      syncLocateButton();
+
+      if (error.code === error.PERMISSION_DENIED) {
+        setLocationStatus("Location permission was denied. Allow location access in the browser and try again.", "error");
+        return;
+      }
+
+      if (error.code === error.POSITION_UNAVAILABLE) {
+        setLocationStatus("The device could not determine your position right now. Try again outdoors or after signal improves.", "error");
+        return;
+      }
+
+      if (error.code === error.TIMEOUT) {
+        setLocationStatus("GPS lookup timed out. Try again in a moment.", "error");
+        return;
+      }
+
+      setLocationStatus("GPS lookup failed. Try again.", "error");
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 120000
+    }
+  );
 }
 
 function selectedStay() {
@@ -671,6 +794,8 @@ function buildMap() {
     }
   });
 
+  locateMeButton.addEventListener("click", requestUserLocation);
+  syncLocateButton();
   renderDayFilters();
   renderDayGroups();
   updateSelectedStay();
