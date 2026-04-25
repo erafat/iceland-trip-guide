@@ -1,5 +1,5 @@
-const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const TILE_URL = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
 const typePalette = {
   Logistics: "#7d6d55",
@@ -391,10 +391,10 @@ function renderUserLocation(position, panToLocation = true) {
   if (!state.userLocationAccuracyCircle) {
     state.userLocationAccuracyCircle = L.circle(latLng, {
       radius: accuracyMeters,
-      color: "#2d6775",
+      color: "#3f7f91",
       weight: 1.5,
       opacity: 0.38,
-      fillColor: "#2d6775",
+      fillColor: "#3f7f91",
       fillOpacity: 0.12
     }).addTo(state.map);
   } else {
@@ -735,15 +735,16 @@ function buildMap() {
   });
 
   L.tileLayer(TILE_URL, {
+    subdomains: "abcd",
     maxZoom: 19,
     attribution: TILE_ATTRIBUTION
   }).addTo(state.map);
 
   state.routeLayers = state.routes.map((route) => {
     const layer = L.polyline(route.latLngs, {
-      color: "#8e4b44",
-      weight: 4.5,
-      opacity: 0.78,
+      color: "#9a5943",
+      weight: 4,
+      opacity: 0.82,
       lineCap: "round"
     });
 
