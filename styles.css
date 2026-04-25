@@ -96,7 +96,7 @@ a {
 }
 
 .meta-label {
-  font-size: 0.66rem;
+  font-size: 0.5rem;
 }
 
 .eyebrow,
@@ -131,20 +131,20 @@ h1 {
 .hero-meta {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 6px;
 }
 
 .meta-card {
   border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  padding: 9px 12px 10px;
+  border-radius: 12px;
+  padding: 5px 7px 6px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(236, 228, 212, 0.55));
 }
 
 .meta-card strong {
   display: block;
-  margin-top: 3px;
-  font-size: 0.92rem;
+  margin-top: 2px;
+  font-size: 0.66rem;
   line-height: 1.15;
 }
 
