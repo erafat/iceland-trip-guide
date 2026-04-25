@@ -29,12 +29,8 @@
           <strong>May 2-9, 2026</strong>
         </div>
         <div class="meta-card">
-          <span class="meta-label">Stops</span>
-          <strong id="stop-count">38</strong>
-        </div>
-        <div class="meta-card">
-          <span class="meta-label">Mode</span>
-          <strong>Map + Guide</strong>
+          <span class="meta-label">Stay Nights</span>
+          <strong id="stay-count">7</strong>
         </div>
       </div>
     </header>
@@ -44,9 +40,12 @@
         <p class="section-kicker">Filter by day</p>
         <div id="day-filters" class="day-filters" aria-label="Day filters"></div>
       </div>
-      <div class="legend-panel">
-        <p class="section-kicker">Legend</p>
-        <ul id="legend" class="legend-list"></ul>
+      <div class="weather-panel">
+        <p class="section-kicker">Weather snapshot</p>
+        <div id="weather-status" class="weather-status-card">
+          <strong>Weather not loaded yet.</strong>
+          <span>Generate <code>data/weather.json</code> to add Meteoblue forecasts.</span>
+        </div>
       </div>
     </section>
 
@@ -58,10 +57,10 @@
 
       <aside class="sidebar">
         <section class="detail-panel">
-          <p class="section-kicker">Selected stop</p>
-          <div id="selected-stop" class="selected-stop-card">
-            <h2>Pick a stop on the map</h2>
-            <p>Hover on desktop or tap on mobile to open the notes, drive context, and the Google Maps link.</p>
+          <p class="section-kicker">Selected stay</p>
+          <div id="selected-stay" class="selected-stop-card">
+            <h2>Pick a stay on the map</h2>
+            <p>Hover on desktop or tap on mobile to open the overnight stay details and routed road leg.</p>
           </div>
         </section>
 

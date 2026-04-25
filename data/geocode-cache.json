@@ -269,5 +269,29 @@
     "displayName": "Dettifoss, Selfoss og Hafragilsfoss, Norðurþing, Northeastern Region, Iceland",
     "provider": "nominatim",
     "queryUsed": "Dettifoss Selfoss Iceland"
+  },
+  "Eyja Guldsmeden Hotel, Reykjavík, Iceland": {
+    "lat": 64.1418514,
+    "lng": -21.9074962,
+    "displayName": "Eyja Guldsmeden, 10;12;14;10-14, Brautarholt, Holt, Hlíðar, Reykjavik, Capital Region, 105, Iceland",
+    "provider": "nominatim"
+  },
+  "Vík, Iceland": {
+    "lat": 63.4188166,
+    "lng": -19.0054737,
+    "displayName": "Vik, Mýrdalshreppur, Southern Region, 870, Iceland",
+    "provider": "nominatim"
+  },
+  "Höfn, Iceland": {
+    "lat": 64.2532647,
+    "lng": -15.2080441,
+    "displayName": "Höfn, Sveitarfélagið Hornafjörður, Southern Region, 780, Iceland",
+    "provider": "nominatim"
+  },
+  "Mývatn, Iceland": {
+    "lat": 65.6032528,
+    "lng": -17.0133301,
+    "displayName": "Mývatn, Reykjahlíð, Þingeyjarsveit, Northeastern Region, Iceland",
+    "provider": "nominatim"
   }
 }

@@ -1,0 +1,140 @@
+[
+  {
+    "day": 1,
+    "dateLabel": "May 2",
+    "overnightStay": "Reykjavik",
+    "hotel": "Eyja Guldsmeden Hotel",
+    "lodgingLabel": "Eyja Guldsmeden Hotel",
+    "stayQuery": "Eyja Guldsmeden Hotel, Reykjavík, Iceland",
+    "mapsUrl": "https://maps.google.com/?q=Eyja%20Guldsmeden%20Hotel%2C%20Reykjav%C3%ADk%2C%20Iceland",
+    "highlightCount": 7,
+    "highlightCategories": [
+      "Logistics",
+      "Landmark",
+      "Shopping",
+      "Museum"
+    ],
+    "note": "Overnight in Reykjavik at Eyja Guldsmeden Hotel.",
+    "lat": 64.1418514,
+    "lng": -21.9074962,
+    "geocodeDisplayName": "Eyja Guldsmeden, 10;12;14;10-14, Brautarholt, Holt, Hlíðar, Reykjavik, Capital Region, 105, Iceland"
+  },
+  {
+    "day": 2,
+    "dateLabel": "May 3",
+    "overnightStay": "Selfoss / Hella",
+    "hotel": "Airbnb",
+    "lodgingLabel": "Airbnb",
+    "stayQuery": "Selfoss, Iceland",
+    "mapsUrl": "https://maps.google.com/?q=Selfoss%2C%20Iceland",
+    "highlightCount": 5,
+    "highlightCategories": [
+      "Nature / UNESCO",
+      "Nature",
+      "Waterfall",
+      "Hot Spring / Hike"
+    ],
+    "note": "Overnight in Selfoss / Hella at Airbnb.",
+    "lat": 63.9368093,
+    "lng": -21.0035319,
+    "geocodeDisplayName": "Selfoss, Sveitarfélagið Árborg, Southern Region, 800, Iceland"
+  },
+  {
+    "day": 3,
+    "dateLabel": "May 4",
+    "overnightStay": "Vik",
+    "hotel": "The Barn",
+    "lodgingLabel": "The Barn",
+    "stayQuery": "Vík, Iceland",
+    "mapsUrl": "https://maps.google.com/?q=V%C3%ADk%2C%20Iceland",
+    "highlightCount": 5,
+    "highlightCategories": [
+      "Waterfall",
+      "Nature / Puffins",
+      "Beach"
+    ],
+    "note": "Overnight in Vik at The Barn.",
+    "lat": 63.4188166,
+    "lng": -19.0054737,
+    "geocodeDisplayName": "Vik, Mýrdalshreppur, Southern Region, 870, Iceland"
+  },
+  {
+    "day": 4,
+    "dateLabel": "May 5",
+    "overnightStay": "Hofn",
+    "hotel": "Seljavellir Guesthouse",
+    "lodgingLabel": "Seljavellir Guesthouse",
+    "stayQuery": "Höfn, Iceland",
+    "mapsUrl": "https://maps.google.com/?q=H%C3%B6fn%2C%20Iceland",
+    "highlightCount": 4,
+    "highlightCategories": [
+      "Canyon",
+      "Waterfall / Hike",
+      "Glacier Lagoon",
+      "Beach"
+    ],
+    "note": "Overnight in Hofn at Seljavellir Guesthouse.",
+    "lat": 64.2532647,
+    "lng": -15.2080441,
+    "geocodeDisplayName": "Höfn, Sveitarfélagið Hornafjörður, Southern Region, 780, Iceland"
+  },
+  {
+    "day": 5,
+    "dateLabel": "May 6",
+    "overnightStay": "Egilsstadir",
+    "hotel": "Egilsstaðir 4",
+    "lodgingLabel": "Egilsstaðir 4",
+    "stayQuery": "Egilsstaðir, Iceland",
+    "mapsUrl": "https://maps.google.com/?q=Egilssta%C3%B0ir%2C%20Iceland",
+    "highlightCount": 4,
+    "highlightCategories": [
+      "Mountain",
+      "Town",
+      "Hot Spring"
+    ],
+    "note": "Overnight in Egilsstadir at Egilsstaðir 4.",
+    "lat": 65.2620412,
+    "lng": -14.4035258,
+    "geocodeDisplayName": "Egilsstaðir, Múlaþing, Eastern Region, 700, Iceland"
+  },
+  {
+    "day": 6,
+    "dateLabel": "May 7",
+    "overnightStay": "Myvatn area",
+    "hotel": "Árskógssandur",
+    "lodgingLabel": "Árskógssandur",
+    "stayQuery": "Mývatn, Iceland",
+    "mapsUrl": "https://maps.google.com/?q=M%C3%BDvatn%2C%20Iceland",
+    "highlightCount": 7,
+    "highlightCategories": [
+      "Canyon / Hike",
+      "Waterfall",
+      "Cave",
+      "Lava Formation",
+      "Geothermal",
+      "Hot Spring"
+    ],
+    "note": "Overnight in Myvatn area at Árskógssandur.",
+    "lat": 65.6032528,
+    "lng": -17.0133301,
+    "geocodeDisplayName": "Mývatn, Reykjahlíð, Þingeyjarsveit, Northeastern Region, Iceland"
+  },
+  {
+    "day": 7,
+    "dateLabel": "May 8",
+    "overnightStay": "Reykjavik",
+    "hotel": "Eyja Guldsmeden Hotel",
+    "lodgingLabel": "Eyja Guldsmeden Hotel",
+    "stayQuery": "Eyja Guldsmeden Hotel, Reykjavík, Iceland",
+    "mapsUrl": "https://maps.google.com/?q=Eyja%20Guldsmeden%20Hotel%2C%20Reykjav%C3%ADk%2C%20Iceland",
+    "highlightCount": 3,
+    "highlightCategories": [
+      "Waterfall",
+      "Town"
+    ],
+    "note": "Overnight in Reykjavik at Eyja Guldsmeden Hotel.",
+    "lat": 64.1418514,
+    "lng": -21.9074962,
+    "geocodeDisplayName": "Eyja Guldsmeden, 10;12;14;10-14, Brautarholt, Holt, Hlíðar, Reykjavik, Capital Region, 105, Iceland"
+  }
+]

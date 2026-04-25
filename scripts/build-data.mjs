@@ -8,11 +8,16 @@ const defaultCsvPath = "/Users/er/Library/Mobile Documents/iCloud~md~obsidian/Do
 const csvPath = process.argv[2] ? path.resolve(process.argv[2]) : defaultCsvPath;
 const dataDir = path.join(repoRoot, "data");
 const cachePath = path.join(dataDir, "geocode-cache.json");
+const routeCachePath = path.join(dataDir, "route-cache.json");
 const stopsPath = path.join(dataDir, "stops.json");
+const staysPath = path.join(dataDir, "stays.json");
+const routesPath = path.join(dataDir, "routes.json");
 
 const geocoderEndpoint = process.env.GEOCODER_ENDPOINT ?? "https://nominatim.openstreetmap.org/search";
+const routerEndpoint = process.env.ROUTER_ENDPOINT ?? "https://router.project-osrm.org/route/v1/driving";
 const userAgent = process.env.GEOCODER_USER_AGENT ?? "iceland-trip-guide-build/1.0 (+https://github.com/erafat/iceland-trip-guide)";
 const requestDelayMs = Number(process.env.GEOCODER_DELAY_MS ?? "1200");
+const routeDelayMs = Number(process.env.ROUTER_DELAY_MS ?? "700");
 
 const fieldMap = {
   Day: "day",
@@ -27,7 +32,7 @@ const fieldMap = {
   Notes: "notes"
 };
 
-const preferredQueries = {
+const preferredStopQueries = {
   "KEF Airport - Car Pickup": ["Keflavik International Airport, Iceland"],
   "Hallgrimskirkja": ["Hallgrímskirkja, Reykjavík, Iceland"],
   "Sun Voyager Sculpture": ["Sun Voyager, Reykjavik, Iceland", "Sólfar, Reykjavík, Iceland"],
@@ -66,6 +71,37 @@ const preferredQueries = {
   "Dahai: Flybus to KEF": ["Keflavik International Airport, Iceland"],
   "Mia Optional: Blue Lagoon": ["Blue Lagoon, Iceland"],
   "Mia: KEF Airport": ["Keflavik International Airport, Iceland"]
+};
+
+const stayPreferences = {
+  1: {
+    lodgingLabel: "Eyja Guldsmeden Hotel",
+    stayQuery: "Eyja Guldsmeden Hotel, Reykjavík, Iceland"
+  },
+  2: {
+    lodgingLabel: "Airbnb",
+    stayQuery: "Selfoss, Iceland"
+  },
+  3: {
+    lodgingLabel: "The Barn",
+    stayQuery: "Vík, Iceland"
+  },
+  4: {
+    lodgingLabel: "Seljavellir Guesthouse",
+    stayQuery: "Höfn, Iceland"
+  },
+  5: {
+    lodgingLabel: "Egilsstaðir 4",
+    stayQuery: "Egilsstaðir, Iceland"
+  },
+  6: {
+    lodgingLabel: "Árskógssandur",
+    stayQuery: "Mývatn, Iceland"
+  },
+  7: {
+    lodgingLabel: "Eyja Guldsmeden Hotel",
+    stayQuery: "Eyja Guldsmeden Hotel, Reykjavík, Iceland"
+  }
 };
 
 function parseCsvLine(line) {
@@ -137,9 +173,9 @@ function normalizeStop(row, index) {
   return stop;
 }
 
-function candidateQueries(stop) {
+function stopCandidateQueries(stop) {
   const candidates = [
-    ...(preferredQueries[stop.stopName] ?? []),
+    ...(preferredStopQueries[stop.stopName] ?? []),
     stop.mapsQuery,
     `${stop.stopName}, ${stop.overnightStay}, Iceland`,
     `${stop.stopName}, Iceland`,
@@ -151,16 +187,63 @@ function candidateQueries(stop) {
   return [...new Set(candidates)];
 }
 
+function stayMapsUrl(query) {
+  return `https://maps.google.com/?q=${encodeURIComponent(query)}`;
+}
+
+function buildStays(stops) {
+  const grouped = new Map();
+
+  for (const stop of stops) {
+    if (!grouped.has(stop.day)) {
+      grouped.set(stop.day, []);
+    }
+    grouped.get(stop.day).push(stop);
+  }
+
+  return Array.from(grouped.entries())
+    .sort((a, b) => a[0] - b[0])
+    .flatMap(([day, dayStops]) => {
+      const firstStop = dayStops[0];
+      if (firstStop.overnightStay === "Departure") {
+        return [];
+      }
+
+      const preference = stayPreferences[day] ?? {};
+      const stayQuery = preference.stayQuery
+        ?? (firstStop.hotel && firstStop.hotel !== "Airbnb"
+          ? `${firstStop.hotel}, ${firstStop.overnightStay}, Iceland`
+          : `${firstStop.overnightStay}, Iceland`);
+
+      const lodgingLabel = preference.lodgingLabel ?? firstStop.hotel ?? firstStop.overnightStay;
+
+      return [{
+        day,
+        dateLabel: firstStop.dateLabel,
+        overnightStay: firstStop.overnightStay,
+        hotel: firstStop.hotel,
+        lodgingLabel,
+        stayQuery,
+        mapsUrl: stayMapsUrl(stayQuery),
+        highlightCount: dayStops.length,
+        highlightCategories: [...new Set(dayStops.map((stop) => stop.type))],
+        note: firstStop.hotel
+          ? `Overnight in ${firstStop.overnightStay} at ${lodgingLabel}.`
+          : `Overnight in ${firstStop.overnightStay}.`
+      }];
+    });
+}
+
 async function sleep(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function loadCache() {
-  if (!existsSync(cachePath)) {
-    return {};
+async function loadJson(filePath, fallback) {
+  if (!existsSync(filePath)) {
+    return fallback;
   }
 
-  const raw = await readFile(cachePath, "utf8");
+  const raw = await readFile(filePath, "utf8");
   return JSON.parse(raw);
 }
 
@@ -200,20 +283,61 @@ async function geocode(query) {
   };
 }
 
-async function geocodeStop(stop) {
-  const queries = candidateQueries(stop);
-  let lastError = null;
+async function resolveCachedGeocode(queryCandidates, cache) {
+  const cachedQuery = queryCandidates.find((query) => cache[query]);
+  if (cachedQuery) {
+    return { data: cache[cachedQuery], queryUsed: cachedQuery, created: false };
+  }
 
-  for (const query of queries) {
+  let lastError = null;
+  for (const query of queryCandidates) {
     try {
       const result = await geocode(query);
-      return { ...result, queryUsed: query };
+      cache[query] = result;
+      return { data: result, queryUsed: query, created: true };
     } catch (error) {
       lastError = error;
     }
   }
 
-  throw lastError ?? new Error(`No geocoding result for "${stop.stopName}"`);
+  throw lastError ?? new Error(`Failed to geocode any candidate query for "${queryCandidates[0]}"`);
+}
+
+async function fetchRoute(fromStay, toStay) {
+  const coordinates = `${fromStay.lng},${fromStay.lat};${toStay.lng},${toStay.lat}`;
+  const url = new URL(`${routerEndpoint}/${coordinates}`);
+  url.searchParams.set("overview", "full");
+  url.searchParams.set("geometries", "polyline6");
+  url.searchParams.set("steps", "false");
+
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": userAgent
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Routing failed for day ${fromStay.day} to day ${toStay.day} with status ${response.status}`);
+  }
+
+  const payload = await response.json();
+  if (payload.code !== "Ok" || !payload.routes?.[0]) {
+    throw new Error(`Routing failed for day ${fromStay.day} to day ${toStay.day}: ${payload.code}`);
+  }
+
+  const route = payload.routes[0];
+  return {
+    arrivalDay: toStay.day,
+    fromDay: fromStay.day,
+    toDay: toStay.day,
+    fromOvernightStay: fromStay.overnightStay,
+    toOvernightStay: toStay.overnightStay,
+    fromLodgingLabel: fromStay.lodgingLabel,
+    toLodgingLabel: toStay.lodgingLabel,
+    distanceMeters: route.distance,
+    durationSeconds: route.duration,
+    geometry: route.geometry
+  };
 }
 
 async function main() {
@@ -221,32 +345,66 @@ async function main() {
 
   const csvText = await readFile(csvPath, "utf8");
   const rows = parseCsv(csvText).map(normalizeStop);
-  const cache = await loadCache();
-  let uncachedCount = 0;
+  const geocodeCache = await loadJson(cachePath, {});
+  const routeCache = await loadJson(routeCachePath, {});
+  const stays = buildStays(rows);
+
+  let uncachedGeocodes = 0;
+  let uncachedRoutes = 0;
 
   for (const stop of rows) {
-    const queries = candidateQueries(stop);
-    const cachedQuery = queries.find((query) => cache[query]);
-
-    if (!cachedQuery) {
-      uncachedCount += 1;
-      const result = await geocodeStop(stop);
-      cache[result.queryUsed] = result;
-      await saveJson(cachePath, cache);
+    const resolved = await resolveCachedGeocode(stopCandidateQueries(stop), geocodeCache);
+    if (resolved.created) {
+      uncachedGeocodes += 1;
+      await saveJson(cachePath, geocodeCache);
       await sleep(requestDelayMs);
     }
 
-    const resolvedQuery = queries.find((query) => cache[query]);
-    stop.lat = cache[resolvedQuery].lat;
-    stop.lng = cache[resolvedQuery].lng;
-    stop.geocodeDisplayName = cache[resolvedQuery].displayName;
+    stop.lat = resolved.data.lat;
+    stop.lng = resolved.data.lng;
+    stop.geocodeDisplayName = resolved.data.displayName;
   }
 
-  await saveJson(cachePath, cache);
-  await saveJson(stopsPath, rows);
+  for (const stay of stays) {
+    const resolved = await resolveCachedGeocode([stay.stayQuery], geocodeCache);
+    if (resolved.created) {
+      uncachedGeocodes += 1;
+      await saveJson(cachePath, geocodeCache);
+      await sleep(requestDelayMs);
+    }
 
-  console.log(`Built ${rows.length} stops from ${path.basename(csvPath)}.`);
-  console.log(`Resolved ${uncachedCount} new geocoding queries; cache size is ${Object.keys(cache).length}.`);
+    stay.lat = resolved.data.lat;
+    stay.lng = resolved.data.lng;
+    stay.geocodeDisplayName = resolved.data.displayName;
+  }
+
+  const routes = [];
+  for (let index = 1; index < stays.length; index += 1) {
+    const fromStay = stays[index - 1];
+    const toStay = stays[index];
+    const key = `${fromStay.day}-${toStay.day}`;
+    const cachedRoute = routeCache[key];
+    const hasUsableGeometry = typeof cachedRoute?.geometry === "string" && cachedRoute.geometry.length > 10;
+
+    if (!hasUsableGeometry) {
+      routeCache[key] = await fetchRoute(fromStay, toStay);
+      uncachedRoutes += 1;
+      await saveJson(routeCachePath, routeCache);
+      await sleep(routeDelayMs);
+    }
+
+    routes.push(routeCache[key]);
+  }
+
+  await saveJson(cachePath, geocodeCache);
+  await saveJson(routeCachePath, routeCache);
+  await saveJson(stopsPath, rows);
+  await saveJson(staysPath, stays);
+  await saveJson(routesPath, routes);
+
+  console.log(`Built ${rows.length} itinerary stops, ${stays.length} stay markers, and ${routes.length} routed legs.`);
+  console.log(`Resolved ${uncachedGeocodes} new geocoding queries; cache size is ${Object.keys(geocodeCache).length}.`);
+  console.log(`Resolved ${uncachedRoutes} new routed road segments; route cache size is ${Object.keys(routeCache).length}.`);
 }
 
 main().catch((error) => {

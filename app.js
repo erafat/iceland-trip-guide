@@ -26,21 +26,45 @@ const typePalette = {
 
 const state = {
   stops: [],
+  stays: [],
+  routes: [],
   activeDay: "all",
-  selectedSequence: null,
+  selectedStayDay: null,
   markers: [],
-  routeLine: null,
+  routeLayers: [],
   map: null,
-  hoveredSequence: null
+  hoveredStayDay: null,
+  weather: {
+    generatedAt: null,
+    source: null,
+    package: null,
+    timezone: null,
+    stays: {}
+  }
 };
 
 const mapElement = document.querySelector("#map");
 const hoverCard = document.querySelector("#hover-card");
-const selectedStopElement = document.querySelector("#selected-stop");
+const selectedStayElement = document.querySelector("#selected-stay");
 const dayFiltersElement = document.querySelector("#day-filters");
 const dayGroupsElement = document.querySelector("#day-groups");
-const legendElement = document.querySelector("#legend");
-const stopCountElement = document.querySelector("#stop-count");
+const stayCountElement = document.querySelector("#stay-count");
+const weatherStatusElement = document.querySelector("#weather-status");
+
+const monthLabels = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
 
 function getDayParam() {
   const params = new URLSearchParams(window.location.search);
@@ -62,24 +86,8 @@ function setDayParam(day) {
   window.history.replaceState({}, "", url);
 }
 
-function shortDate(dateLabel) {
-  return dateLabel.replace("May ", "May ");
-}
-
-function colorForType(type) {
-  return typePalette[type] ?? "#2d6775";
-}
-
-function supportsHover() {
-  return window.matchMedia("(hover: hover)").matches;
-}
-
-function stopsForDay(day) {
-  return state.stops.filter((stop) => day === "all" || stop.day === day);
-}
-
 function escapeHtml(text) {
-  return text
+  return String(text ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -87,55 +95,316 @@ function escapeHtml(text) {
     .replaceAll("'", "&#39;");
 }
 
-function markerHtml(stop) {
+function supportsHover() {
+  return window.matchMedia("(hover: hover)").matches;
+}
+
+function decodePolyline6(encoded) {
+  let index = 0;
+  let lat = 0;
+  let lng = 0;
+  const coordinates = [];
+
+  while (index < encoded.length) {
+    let result = 0;
+    let shift = 0;
+    let byte;
+
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+
+    const deltaLat = (result & 1) ? ~(result >> 1) : (result >> 1);
+    lat += deltaLat;
+
+    result = 0;
+    shift = 0;
+
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+
+    const deltaLng = (result & 1) ? ~(result >> 1) : (result >> 1);
+    lng += deltaLng;
+
+    coordinates.push([lat / 1e6, lng / 1e6]);
+  }
+
+  return coordinates;
+}
+
+function formatDistance(meters) {
+  return `${Math.round(meters / 1000)} km`;
+}
+
+function formatDuration(seconds) {
+  const totalMinutes = Math.round(seconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours === 0) {
+    return `${minutes} min`;
+  }
+
+  if (minutes === 0) {
+    return `${hours} hr`;
+  }
+
+  return `${hours} hr ${minutes} min`;
+}
+
+function formatIsoDate(dateIso) {
+  if (!dateIso) {
+    return null;
+  }
+
+  const [year, month, day] = dateIso.split("-").map(Number);
+  if (!year || !month || !day) {
+    return dateIso;
+  }
+
+  return `${monthLabels[month - 1]} ${day}, ${year}`;
+}
+
+function formatSnapshotTime(timestamp) {
+  if (!timestamp) {
+    return null;
+  }
+
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
+}
+
+function weatherForDay(day) {
+  return state.weather.stays?.[String(day)] ?? null;
+}
+
+function formatTemperature(value) {
+  return Number.isFinite(value) ? `${Math.round(value)}°C` : null;
+}
+
+function formatPrecipitation(value) {
+  if (!Number.isFinite(value)) {
+    return null;
+  }
+
+  const rounded = value >= 10 ? Math.round(value) : Math.round(value * 10) / 10;
+  return `${rounded} mm rain`;
+}
+
+function formatWind(value) {
+  return Number.isFinite(value) ? `${Math.round(value)} km/h wind` : null;
+}
+
+function weatherSummaryParts(summary) {
+  if (!summary) {
+    return [];
+  }
+
+  const hiLo = summary.temperatureMaxC != null || summary.temperatureMinC != null
+    ? `${formatTemperature(summary.temperatureMaxC) ?? "?"} / ${formatTemperature(summary.temperatureMinC) ?? "?"}`
+    : null;
+
+  return [
+    hiLo,
+    formatPrecipitation(summary.precipitationTotalMm),
+    formatWind(summary.windspeedMeanKmh),
+    summary.precipitationProbabilityPct != null ? `${summary.precipitationProbabilityPct}% precip` : null
+  ].filter(Boolean);
+}
+
+function weatherInlineHtml(day) {
+  const weather = weatherForDay(day);
+  if (!weather || weather.status !== "forecast") {
+    return "";
+  }
+
+  return `<p class="weather-inline">${escapeHtml(weatherSummaryParts(weather.summary).join(" · "))}</p>`;
+}
+
+function weatherDetailHtml(stay) {
+  const weather = weatherForDay(stay.day);
+  if (!weather) {
+    return "";
+  }
+
+  if (weather.status === "forecast") {
+    const updatedAt = formatSnapshotTime(state.weather.generatedAt);
+    return `
+      <section class="weather-card">
+        <p class="section-kicker">Weather</p>
+        <div class="weather-metrics">
+          <div class="weather-metric">
+            <span class="weather-metric-label">High / low</span>
+            <strong>${escapeHtml(`${formatTemperature(weather.summary.temperatureMaxC) ?? "?"} / ${formatTemperature(weather.summary.temperatureMinC) ?? "?"}`)}</strong>
+          </div>
+          <div class="weather-metric">
+            <span class="weather-metric-label">Rain</span>
+            <strong>${escapeHtml(formatPrecipitation(weather.summary.precipitationTotalMm) ?? "n/a")}</strong>
+          </div>
+          <div class="weather-metric">
+            <span class="weather-metric-label">Wind</span>
+            <strong>${escapeHtml(formatWind(weather.summary.windspeedMeanKmh) ?? "n/a")}</strong>
+          </div>
+        </div>
+        <p class="weather-update">
+          Meteoblue ${escapeHtml(state.weather.package ?? "forecast")} for ${escapeHtml(formatIsoDate(weather.dateIso) ?? stay.dateLabel)}
+          ${updatedAt ? ` · refreshed ${escapeHtml(updatedAt)}` : ""}
+        </p>
+      </section>
+    `;
+  }
+
+  if (weather.status === "out_of_range") {
+    return `
+      <section class="weather-card weather-card--muted">
+        <p class="section-kicker">Weather</p>
+        <p class="weather-update">
+          Forecast not published yet for ${escapeHtml(formatIsoDate(weather.dateIso) ?? stay.dateLabel)}.
+          ${weather.lastAvailableDate ? ` Latest Meteoblue day returned: ${escapeHtml(formatIsoDate(weather.lastAvailableDate) ?? weather.lastAvailableDate)}.` : ""}
+        </p>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="weather-card weather-card--muted">
+      <p class="section-kicker">Weather</p>
+      <p class="weather-update">Weather refresh failed on the last snapshot for this stay.</p>
+    </section>
+  `;
+}
+
+function weatherStripHtml(day) {
+  const weather = weatherForDay(day);
+  if (!weather || weather.status !== "forecast") {
+    return "";
+  }
+
+  return `<div class="weather-strip">${escapeHtml(weatherSummaryParts(weather.summary).join(" · "))}</div>`;
+}
+
+function markerHtml(stay) {
   return `
     <div class="marker-shell">
       <div class="marker-dot">
-        <span class="marker-day">Day ${stop.day}</span>
-        <span class="marker-sequence">${stop.sequence}</span>
-        <span class="marker-short-date">${escapeHtml(shortDate(stop.dateLabel))}</span>
+        <span class="marker-day">Day ${stay.day}</span>
+        <span class="marker-sequence">${stay.day}</span>
+        <span class="marker-short-date">${escapeHtml(stay.dateLabel)}</span>
       </div>
     </div>
   `;
 }
 
-function stopPreviewHtml(stop) {
+function selectedStay() {
+  return state.stays.find((stay) => stay.day === state.selectedStayDay) ?? null;
+}
+
+function routeForDay(day) {
+  return state.routes.find((route) => route.arrivalDay === day) ?? null;
+}
+
+function visibleRouteRecords() {
+  if (state.activeDay === "all") {
+    return state.routes;
+  }
+
+  return state.routes.filter((route) => route.arrivalDay === state.activeDay);
+}
+
+function visibleStayDays() {
+  if (state.activeDay === "all") {
+    return new Set(state.stays.map((stay) => stay.day));
+  }
+
+  const maxStayDay = Math.max(...state.stays.map((stay) => stay.day));
+  if (state.activeDay <= 1) {
+    return new Set([1]);
+  }
+
+  if (state.activeDay > maxStayDay) {
+    return new Set([maxStayDay]);
+  }
+
+  return new Set([state.activeDay - 1, state.activeDay]);
+}
+
+function defaultSelectedStayDayForFilter(day) {
+  if (day === "all") {
+    return state.selectedStayDay ?? state.stays[0]?.day ?? null;
+  }
+
+  const exact = state.stays.find((stay) => stay.day === day);
+  if (exact) {
+    return exact.day;
+  }
+
+  return state.stays[state.stays.length - 1]?.day ?? null;
+}
+
+function stayPreviewHtml(stay) {
   return `
-    <p class="section-kicker">Day ${stop.day} · ${escapeHtml(stop.dateLabel)}</p>
-    <h3>${escapeHtml(stop.stopName)}</h3>
-    <p class="stop-note">${escapeHtml(stop.notes)}</p>
-    <p class="stop-meta">${escapeHtml(stop.type)} · ${escapeHtml(stop.timeNeeded)}</p>
+    <p class="section-kicker">Day ${stay.day} · ${escapeHtml(stay.dateLabel)}</p>
+    <h3>${escapeHtml(stay.overnightStay)}</h3>
+    <p class="stop-note">${escapeHtml(stay.lodgingLabel)}</p>
+    <p class="stop-meta">${stay.highlightCount} highlights that day</p>
+    ${weatherInlineHtml(stay.day)}
   `;
 }
 
-function stopDetailHtml(stop) {
+function stayPopupHtml(stay) {
   return `
-    <p class="section-kicker">Day ${stop.day} · ${escapeHtml(stop.dateLabel)}</p>
-    <h2>${escapeHtml(stop.stopName)}</h2>
-    <p class="stop-meta">${escapeHtml(stop.type)} · ${escapeHtml(stop.timeNeeded)}</p>
-    <p class="stop-drive"><strong>Drive from previous:</strong> ${escapeHtml(stop.driveFromPrevious)}</p>
-    <p class="stop-note">${escapeHtml(stop.notes)}</p>
+    <strong>${escapeHtml(stay.overnightStay)}</strong><br>
+    Day ${stay.day} · ${escapeHtml(stay.dateLabel)}<br>
+    ${escapeHtml(stay.lodgingLabel)}
+    ${weatherForDay(stay.day)?.status === "forecast" ? `<br>${escapeHtml(weatherSummaryParts(weatherForDay(stay.day).summary).join(" · "))}` : ""}
+  `;
+}
+
+function stayDetailHtml(stay) {
+  const route = routeForDay(stay.day);
+  const routeBlock = route
+    ? `<p class="stop-drive"><strong>Drive leg:</strong> ${formatDistance(route.distanceMeters)} · ${formatDuration(route.durationSeconds)} from ${escapeHtml(route.fromOvernightStay)}</p>`
+    : `<p class="stop-drive"><strong>Arrival:</strong> First overnight stay of the trip.</p>`;
+
+  return `
+    <p class="section-kicker">Day ${stay.day} · ${escapeHtml(stay.dateLabel)}</p>
+    <h2>${escapeHtml(stay.overnightStay)}</h2>
+    <p class="stay-lodging">${escapeHtml(stay.lodgingLabel)}</p>
+    <p class="stop-meta">${stay.highlightCount} itinerary highlights</p>
+    ${routeBlock}
+    <p class="stop-note">${escapeHtml(stay.note)}</p>
+    ${weatherDetailHtml(stay)}
     <div class="stop-links">
-      <a href="${stop.mapsUrl}" target="_blank" rel="noreferrer">Open in Google Maps</a>
+      <a href="${stay.mapsUrl}" target="_blank" rel="noreferrer">Open stay on Google Maps</a>
     </div>
   `;
 }
 
-function popupHtml(stop) {
-  return `
-    <strong>${escapeHtml(stop.stopName)}</strong><br>
-    Day ${stop.day} · ${escapeHtml(stop.dateLabel)}<br>
-    ${escapeHtml(stop.type)}
-  `;
+function colorForType(type) {
+  return typePalette[type] ?? "#2d6775";
 }
 
-function updateHoverCard(stop, latlng) {
+function updateHoverCard(stay, latlng) {
   if (!latlng || !supportsHover()) {
     hoverCard.classList.add("is-hidden");
     return;
   }
 
-  hoverCard.innerHTML = stopPreviewHtml(stop);
+  hoverCard.innerHTML = stayPreviewHtml(stay);
   const point = state.map.latLngToContainerPoint(latlng);
   hoverCard.style.left = `${point.x}px`;
   hoverCard.style.top = `${point.y}px`;
@@ -146,39 +415,35 @@ function hideHoverCard() {
   hoverCard.classList.add("is-hidden");
 }
 
-function updateSelectedStop() {
-  const stop = state.stops.find((item) => item.sequence === state.selectedSequence);
-  if (!stop) {
-    selectedStopElement.innerHTML = `
-      <h2>Pick a stop on the map</h2>
-      <p>Hover on desktop or tap on mobile to open the notes, drive context, and the Google Maps link.</p>
+function updateSelectedStay() {
+  const stay = selectedStay();
+  if (!stay) {
+    selectedStayElement.innerHTML = `
+      <h2>Pick a stay on the map</h2>
+      <p>Hover on desktop or tap on mobile to open the overnight stay details and routed road leg.</p>
     `;
     return;
   }
 
-  selectedStopElement.innerHTML = stopDetailHtml(stop);
+  selectedStayElement.innerHTML = stayDetailHtml(stay);
 }
 
-function renderLegend() {
-  const seen = new Set();
-  const orderedTypes = state.stops
-    .map((stop) => stop.type)
-    .filter((type) => {
-      if (seen.has(type)) {
-        return false;
-      }
-      seen.add(type);
-      return true;
-    });
+function renderWeatherStatus() {
+  const entries = Object.values(state.weather.stays ?? {});
+  const forecastCount = entries.filter((entry) => entry.status === "forecast").length;
 
-  legendElement.innerHTML = orderedTypes
-    .map((type) => `
-      <li class="legend-item">
-        <span class="legend-swatch" style="--swatch:${colorForType(type)}"></span>
-        <span>${escapeHtml(type)}</span>
-      </li>
-    `)
-    .join("");
+  if (!entries.length || !state.weather.generatedAt) {
+    weatherStatusElement.innerHTML = `
+      <strong>Weather not loaded yet.</strong>
+      <span>Run the Meteoblue snapshot build to add forecasts for each overnight stay.</span>
+    `;
+    return;
+  }
+
+  weatherStatusElement.innerHTML = `
+    <strong>${forecastCount} of ${entries.length} stay dates currently have forecast data.</strong>
+    <span>${escapeHtml(state.weather.source ?? "meteoblue")} ${escapeHtml(state.weather.package ?? "")} snapshot refreshed ${escapeHtml(formatSnapshotTime(state.weather.generatedAt) ?? "recently")}.</span>
+  `;
 }
 
 function renderDayFilters() {
@@ -193,8 +458,10 @@ function renderDayFilters() {
     button.addEventListener("click", () => {
       const value = button.dataset.day === "all" ? "all" : Number(button.dataset.day);
       state.activeDay = value;
+      state.selectedStayDay = defaultSelectedStayDayForFilter(value);
       setDayParam(value);
       renderDayFilters();
+      updateSelectedStay();
       renderDayGroups();
       updateMapVisibility();
     });
@@ -213,10 +480,11 @@ function renderDayGroups() {
 
   dayGroupsElement.innerHTML = Array.from(grouped.entries()).map(([day, stops]) => {
     const hiddenClass = state.activeDay !== "all" && state.activeDay !== day ? "is-hidden" : "";
+    const selectedClass = state.selectedStayDay === day ? "is-selected" : "";
     const overnight = stops.find((stop) => stop.hotel);
     const firstStop = stops[0];
     return `
-      <article class="day-card ${hiddenClass}" data-day-card="${day}">
+      <article class="day-card ${hiddenClass} ${selectedClass}" data-day-card="${day}">
         <div class="day-header">
           <div>
             <p class="section-kicker">Day ${day}</p>
@@ -228,9 +496,10 @@ function renderDayGroups() {
           <strong>Overnight:</strong> ${escapeHtml(firstStop.overnightStay)}
           ${overnight?.hotel ? `<br><span class="day-summary">${escapeHtml(overnight.hotel)}</span>` : ""}
         </div>
+        ${weatherStripHtml(day)}
         <ol class="day-stop-list">
           ${stops.map((stop) => `
-            <li class="day-stop-item ${state.selectedSequence === stop.sequence ? "is-selected" : ""}" data-sequence="${stop.sequence}">
+            <li class="day-stop-item" data-sequence="${stop.sequence}">
               <div class="stop-title-row">
                 <span class="stop-title">${escapeHtml(stop.stopName)}</span>
                 <span class="stop-type-pill" style="background:${colorForType(stop.type)}20;color:${colorForType(stop.type)}">${escapeHtml(stop.type)}</span>
@@ -246,55 +515,64 @@ function renderDayGroups() {
       </article>
     `;
   }).join("");
+}
 
-  dayGroupsElement.querySelectorAll(".day-stop-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      const sequence = Number(item.dataset.sequence);
-      selectStop(sequence, true);
-    });
-  });
+function fitMapToVisibleGeometry(visibleStays, visibleRoutes) {
+  const latLngs = [
+    ...visibleStays.map((stay) => [stay.lat, stay.lng]),
+    ...visibleRoutes.flatMap((route) => route.latLngs)
+  ];
+
+  if (latLngs.length === 0) {
+    return;
+  }
+
+  const bounds = L.latLngBounds(latLngs);
+  state.map.fitBounds(bounds.pad(0.16), { animate: false });
 }
 
 function updateMapVisibility() {
-  const visibleStops = stopsForDay(state.activeDay);
-  const visibleSequences = new Set(visibleStops.map((stop) => stop.sequence));
+  const visibleDays = visibleStayDays();
+  const visibleStays = state.stays.filter((stay) => visibleDays.has(stay.day));
+  const visibleRoutes = visibleRouteRecords();
 
   for (const markerRecord of state.markers) {
-    if (visibleSequences.has(markerRecord.stop.sequence)) {
+    if (visibleDays.has(markerRecord.stay.day)) {
       markerRecord.marker.addTo(state.map);
     } else {
       markerRecord.marker.remove();
     }
   }
 
-  if (state.routeLine) {
-    state.routeLine.setLatLngs(visibleStops.map((stop) => [stop.lat, stop.lng]));
+  for (const routeRecord of state.routeLayers) {
+    if (visibleRoutes.includes(routeRecord.route)) {
+      routeRecord.layer.addTo(state.map);
+    } else {
+      routeRecord.layer.remove();
+    }
   }
 
-  if (visibleStops.length > 0) {
-    const bounds = L.latLngBounds(visibleStops.map((stop) => [stop.lat, stop.lng]));
-    state.map.fitBounds(bounds.pad(0.2), { animate: false });
-  }
+  fitMapToVisibleGeometry(visibleStays, visibleRoutes);
 
-  if (state.selectedSequence && !visibleSequences.has(state.selectedSequence)) {
-    state.selectedSequence = null;
-    updateSelectedStop();
+  if (state.selectedStayDay && !visibleDays.has(state.selectedStayDay) && state.activeDay !== "all") {
+    state.selectedStayDay = defaultSelectedStayDayForFilter(state.activeDay);
+    updateSelectedStay();
     renderDayGroups();
   }
 }
 
-function selectStop(sequence, panToStop = false) {
-  const stop = state.stops.find((item) => item.sequence === sequence);
-  if (!stop) {
+function selectStay(day, panToStay = false) {
+  const stay = state.stays.find((item) => item.day === day);
+  if (!stay) {
     return;
   }
 
-  state.selectedSequence = sequence;
-  updateSelectedStop();
+  state.selectedStayDay = day;
+  updateSelectedStay();
   renderDayGroups();
 
-  if (panToStop) {
-    state.map.flyTo([stop.lat, stop.lng], Math.max(state.map.getZoom(), 7), {
+  if (panToStay) {
+    state.map.flyTo([stay.lat, stay.lng], Math.max(state.map.getZoom(), 7), {
       animate: true,
       duration: 0.8
     });
@@ -312,40 +590,44 @@ function buildMap() {
     attribution: TILE_ATTRIBUTION
   }).addTo(state.map);
 
-  state.routeLine = L.polyline([], {
-    color: "#8e4b44",
-    weight: 4,
-    opacity: 0.75,
-    lineCap: "round"
-  }).addTo(state.map);
+  state.routeLayers = state.routes.map((route) => {
+    const layer = L.polyline(route.latLngs, {
+      color: "#8e4b44",
+      weight: 4.5,
+      opacity: 0.78,
+      lineCap: "round"
+    });
 
-  state.markers = state.stops.map((stop) => {
-    const marker = L.marker([stop.lat, stop.lng], {
+    return { route, layer };
+  });
+
+  state.markers = state.stays.map((stay) => {
+    const marker = L.marker([stay.lat, stay.lng], {
       icon: L.divIcon({
-        html: markerHtml(stop),
+        html: markerHtml(stay),
         className: "",
         iconSize: [54, 54],
         iconAnchor: [27, 52]
       }),
-      title: `${stop.stopName} (Day ${stop.day})`
+      title: `${stay.overnightStay} (Day ${stay.day})`
     });
 
-    marker.bindPopup(popupHtml(stop));
+    marker.bindPopup(stayPopupHtml(stay));
 
     marker.on("mouseover", () => {
-      state.hoveredSequence = stop.sequence;
-      updateHoverCard(stop, marker.getLatLng());
+      state.hoveredStayDay = stay.day;
+      updateHoverCard(stay, marker.getLatLng());
     });
 
     marker.on("mouseout", () => {
-      state.hoveredSequence = null;
+      state.hoveredStayDay = null;
       hideHoverCard();
     });
 
     marker.on("click", () => {
-      state.hoveredSequence = null;
+      state.hoveredStayDay = null;
       hideHoverCard();
-      selectStop(stop.sequence, false);
+      selectStay(stay.day, false);
 
       if (supportsHover()) {
         marker.closePopup();
@@ -354,39 +636,73 @@ function buildMap() {
       }
     });
 
-    return { marker, stop };
+    return { marker, stay };
   });
 
   state.map.on("zoomstart movestart", () => {
-    if (!state.hoveredSequence) {
+    if (!state.hoveredStayDay) {
       hideHoverCard();
     }
   });
 
   renderDayFilters();
   renderDayGroups();
+  updateSelectedStay();
   updateMapVisibility();
 }
 
-async function loadStops() {
-  const response = await fetch("./data/stops.json");
+async function loadJson(url, label) {
+  const response = await fetch(url);
   if (!response.ok) {
-    throw new Error("Failed to load stops.json");
+    throw new Error(`Failed to load ${label}`);
+  }
+
+  return response.json();
+}
+
+async function loadWeather() {
+  const response = await fetch("./data/weather.json", { cache: "no-store" });
+  if (response.status === 404) {
+    return { stays: {} };
+  }
+
+  if (!response.ok) {
+    throw new Error("Failed to load weather.json");
   }
 
   return response.json();
 }
 
 async function main() {
-  state.stops = await loadStops();
+  const [stops, stays, routes, weather] = await Promise.all([
+    loadJson("./data/stops.json", "stops.json"),
+    loadJson("./data/stays.json", "stays.json"),
+    loadJson("./data/routes.json", "routes.json"),
+    loadWeather()
+  ]);
+
+  state.stops = stops;
+  state.stays = stays;
+  state.routes = routes.map((route) => ({
+    ...route,
+    latLngs: decodePolyline6(route.geometry)
+  }));
+  state.weather = {
+    generatedAt: weather.generatedAt ?? null,
+    source: weather.source ?? "meteoblue",
+    package: weather.package ?? null,
+    timezone: weather.timezone ?? null,
+    stays: weather.stays ?? {}
+  };
   state.activeDay = getDayParam();
-  stopCountElement.textContent = String(state.stops.length);
-  renderLegend();
+  state.selectedStayDay = defaultSelectedStayDayForFilter(state.activeDay);
+  stayCountElement.textContent = String(state.stays.length);
+  renderWeatherStatus();
   buildMap();
 }
 
 main().catch((error) => {
-  selectedStopElement.innerHTML = `
+  selectedStayElement.innerHTML = `
     <h2>Site failed to load</h2>
     <p>${escapeHtml(error.message)}</p>
   `;

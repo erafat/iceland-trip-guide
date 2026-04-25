@@ -1,0 +1,14 @@
+{
+  "generatedAt": null,
+  "source": "meteoblue",
+  "package": "basic-day",
+  "timezone": "Atlantic/Reykjavik",
+  "forecastDays": 7,
+  "tripYear": 2026,
+  "units": {
+    "temperature": "C",
+    "windspeed": "kmh",
+    "precipitation": "mm"
+  },
+  "stays": {}
+}

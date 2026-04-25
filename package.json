@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build:data": "node scripts/build-data.mjs",
+    "build:weather": "node scripts/build-weather.mjs",
     "check:data": "node scripts/check-data.mjs"
   }
 }
