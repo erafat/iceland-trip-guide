@@ -1,5 +1,5 @@
 {
-  "generatedAt": null,
+  "generatedAt": "2026-04-25T18:22:16.518Z",
   "source": "meteoblue",
   "package": "basic-day",
   "timezone": "Atlantic/Reykjavik",
@@ -10,5 +10,69 @@
     "windspeed": "kmh",
     "precipitation": "mm"
   },
-  "stays": {}
+  "stays": {
+    "1": {
+      "overnightStay": "Reykjavik",
+      "dateIso": "2026-05-02",
+      "modelrunUtc": null,
+      "modelrunUpdatedUtc": null,
+      "status": "out_of_range",
+      "firstAvailableDate": "2026-04-25",
+      "lastAvailableDate": "2026-05-01"
+    },
+    "2": {
+      "overnightStay": "Selfoss / Hella",
+      "dateIso": "2026-05-03",
+      "modelrunUtc": null,
+      "modelrunUpdatedUtc": null,
+      "status": "out_of_range",
+      "firstAvailableDate": "2026-04-25",
+      "lastAvailableDate": "2026-05-01"
+    },
+    "3": {
+      "overnightStay": "Vik",
+      "dateIso": "2026-05-04",
+      "modelrunUtc": null,
+      "modelrunUpdatedUtc": null,
+      "status": "out_of_range",
+      "firstAvailableDate": "2026-04-25",
+      "lastAvailableDate": "2026-05-01"
+    },
+    "4": {
+      "overnightStay": "Hofn",
+      "dateIso": "2026-05-05",
+      "modelrunUtc": null,
+      "modelrunUpdatedUtc": null,
+      "status": "out_of_range",
+      "firstAvailableDate": "2026-04-25",
+      "lastAvailableDate": "2026-05-01"
+    },
+    "5": {
+      "overnightStay": "Egilsstadir",
+      "dateIso": "2026-05-06",
+      "modelrunUtc": null,
+      "modelrunUpdatedUtc": null,
+      "status": "out_of_range",
+      "firstAvailableDate": "2026-04-25",
+      "lastAvailableDate": "2026-05-01"
+    },
+    "6": {
+      "overnightStay": "Myvatn area",
+      "dateIso": "2026-05-07",
+      "modelrunUtc": null,
+      "modelrunUpdatedUtc": null,
+      "status": "out_of_range",
+      "firstAvailableDate": "2026-04-25",
+      "lastAvailableDate": "2026-05-01"
+    },
+    "7": {
+      "overnightStay": "Reykjavik",
+      "dateIso": "2026-05-08",
+      "modelrunUtc": null,
+      "modelrunUpdatedUtc": null,
+      "status": "out_of_range",
+      "firstAvailableDate": "2026-04-25",
+      "lastAvailableDate": "2026-05-01"
+    }
+  }
 }
