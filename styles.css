@@ -380,6 +380,36 @@ h1 {
   font-size: 0.95rem;
 }
 
+.stop-hours-block {
+  margin-top: 8px;
+  display: grid;
+  gap: 4px;
+}
+
+.stop-hours,
+.stop-hours-note,
+.stop-hours-meta {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.stop-hours {
+  color: var(--ink);
+}
+
+.stop-hours-note,
+.stop-hours-meta {
+  color: var(--muted);
+}
+
+.stop-hours-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
 .weather-inline {
   margin-top: 8px;
   font-size: 0.88rem;

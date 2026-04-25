@@ -1,0 +1,48 @@
+{
+  "Hallgrimskirkja": {
+    "operatingHours": "May 2, 2026: 10:00-17:00; tower last admission 16:45.",
+    "hoursNote": "Church access is restricted during services and concerts. On May 2, the nave is closed about 11:30-12:45 for a lunchtime concert.",
+    "hoursSource": "https://www.hallgrimskirkja.is/en-gb/opnunartimar",
+    "hoursVerifiedOn": "2026-04-25"
+  },
+  "Harpa Concert Hall": {
+    "operatingHours": "Building hours: Sunday-Tuesday 10:00-18:00; Wednesday-Saturday 10:00-20:00.",
+    "hoursNote": "The box office is open daily 10:00-18:00 and longer on event nights.",
+    "hoursSource": "https://www.harpa.is/en/opening-hours",
+    "hoursVerifiedOn": "2026-04-25"
+  },
+  "Icelandic Phallological Museum": {
+    "operatingHours": "Open every day 10:00-19:00.",
+    "hoursSource": "https://www.phallus.is/",
+    "hoursVerifiedOn": "2026-04-25"
+  },
+  "Thingvellir National Park": {
+    "operatingHours": "Visitor centre hours (April-October): 09:00-18:00.",
+    "hoursNote": "The stop itself is the national park; these hours are for the Hakið visitor centre and exhibition.",
+    "hoursSource": "https://www.thingvellir.is/en/things-to-do/visitor-centre/",
+    "hoursVerifiedOn": "2026-04-25"
+  },
+  "Kerid Crater": {
+    "operatingHours": "Open when the sun is shining.",
+    "hoursSource": "https://kerid.is/",
+    "hoursVerifiedOn": "2026-04-25"
+  },
+  "Vok Baths": {
+    "operatingHours": "For your May visit window: daily 12:00-22:00.",
+    "hoursNote": "Guests can stay in the pools until 15 minutes before closing.",
+    "hoursSource": "https://vokbaths.is/en/hours-prices/",
+    "hoursVerifiedOn": "2026-04-25"
+  },
+  "Earth Lagoon Myvatn": {
+    "operatingHours": "After the spring 2026 reopening: daily 12:00-22:00.",
+    "hoursNote": "The official site says the lagoon is closed for construction from January 1, 2026 until spring 2026, so this one should be rechecked close to your trip.",
+    "hoursSource": "https://www.earthlagoon.is/",
+    "hoursVerifiedOn": "2026-04-25"
+  },
+  "Mia Optional: Blue Lagoon": {
+    "operatingHours": "For your May 9, 2026 visit window: daily 08:00-20:00.",
+    "hoursNote": "Blue Lagoon asks guests to leave the water 30 minutes before closing.",
+    "hoursSource": "https://www.bluelagoon.com/opening-hours",
+    "hoursVerifiedOn": "2026-04-25"
+  }
+}

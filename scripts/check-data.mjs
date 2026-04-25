@@ -17,6 +17,8 @@ const [stops, stays, routes, weather] = await Promise.all([
 const missingStopCoordinates = stops.filter((stop) => Number.isNaN(stop.lat) || Number.isNaN(stop.lng));
 const missingStayCoordinates = stays.filter((stay) => Number.isNaN(stay.lat) || Number.isNaN(stay.lng));
 const badRoutes = routes.filter((route) => typeof route.geometry !== "string" || route.geometry.length < 10);
+const stopsWithHours = stops.filter((stop) => typeof stop.operatingHours === "string" && stop.operatingHours.trim());
+const badHoursSources = stopsWithHours.filter((stop) => !/^https?:\/\//.test(stop.hoursSource ?? ""));
 const stayDays = new Set(stays.map((stay) => stay.day));
 const weatherDays = new Set(Object.keys(weather.stays ?? {}).map(Number));
 
@@ -26,6 +28,7 @@ console.log(`Road-route legs: ${routes.length}`);
 console.log(`Missing stop coordinates: ${missingStopCoordinates.length}`);
 console.log(`Missing stay coordinates: ${missingStayCoordinates.length}`);
 console.log(`Bad routes: ${badRoutes.length}`);
+console.log(`Stops with hours: ${stopsWithHours.length}`);
 console.log(`Weather stay entries: ${weatherDays.size}`);
 
 if (stops.length !== 38) {
@@ -46,6 +49,10 @@ if (missingStopCoordinates.length > 0 || missingStayCoordinates.length > 0) {
 
 if (badRoutes.length > 0) {
   throw new Error("Found routed legs without usable road geometry.");
+}
+
+if (badHoursSources.length > 0) {
+  throw new Error("Found stop operating-hours entries without a valid source URL.");
 }
 
 for (const day of weatherDays) {

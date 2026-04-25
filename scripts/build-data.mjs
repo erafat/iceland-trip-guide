@@ -12,6 +12,7 @@ const routeCachePath = path.join(dataDir, "route-cache.json");
 const stopsPath = path.join(dataDir, "stops.json");
 const staysPath = path.join(dataDir, "stays.json");
 const routesPath = path.join(dataDir, "routes.json");
+const stopOverridesPath = path.join(repoRoot, "scripts", "stop-overrides.json");
 
 const geocoderEndpoint = process.env.GEOCODER_ENDPOINT ?? "https://nominatim.openstreetmap.org/search";
 const routerEndpoint = process.env.ROUTER_ENDPOINT ?? "https://router.project-osrm.org/route/v1/driving";
@@ -160,7 +161,7 @@ function extractGoogleQuery(url) {
   }
 }
 
-function normalizeStop(row, index) {
+function normalizeStop(row, index, stopOverrides) {
   const stop = { sequence: index + 1 };
 
   for (const [csvKey, jsonKey] of Object.entries(fieldMap)) {
@@ -169,6 +170,7 @@ function normalizeStop(row, index) {
 
   stop.day = Number(stop.day);
   stop.mapsQuery = extractGoogleQuery(stop.mapsUrl);
+  Object.assign(stop, stopOverrides[stop.stopName] ?? {});
 
   return stop;
 }
@@ -344,7 +346,8 @@ async function main() {
   await mkdir(dataDir, { recursive: true });
 
   const csvText = await readFile(csvPath, "utf8");
-  const rows = parseCsv(csvText).map(normalizeStop);
+  const stopOverrides = await loadJson(stopOverridesPath, {});
+  const rows = parseCsv(csvText).map((row, index) => normalizeStop(row, index, stopOverrides));
   const geocodeCache = await loadJson(cachePath, {});
   const routeCache = await loadJson(routeCachePath, {});
   const stays = buildStays(rows);

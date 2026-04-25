@@ -297,6 +297,31 @@ function weatherStripHtml(day) {
   return `<div class="weather-strip">${escapeHtml(weatherSummaryParts(weather.summary).join(" · "))}</div>`;
 }
 
+function hoursHtml(stop) {
+  if (!stop.operatingHours) {
+    return "";
+  }
+
+  const note = stop.hoursNote
+    ? `<p class="stop-hours-note">${escapeHtml(stop.hoursNote)}</p>`
+    : "";
+  const source = stop.hoursSource
+    ? `<a href="${stop.hoursSource}" target="_blank" rel="noreferrer">Official hours</a>`
+    : "";
+  const verified = stop.hoursVerifiedOn
+    ? `<span>Verified ${escapeHtml(stop.hoursVerifiedOn)}</span>`
+    : "";
+  const meta = [source, verified].filter(Boolean).join("<span aria-hidden=\"true\">·</span>");
+
+  return `
+    <div class="stop-hours-block">
+      <p class="stop-hours"><strong>Hours:</strong> ${escapeHtml(stop.operatingHours)}</p>
+      ${note}
+      ${meta ? `<div class="stop-hours-meta">${meta}</div>` : ""}
+    </div>
+  `;
+}
+
 function markerHtml(stay) {
   return `
     <div class="marker-shell">
@@ -505,6 +530,7 @@ function renderDayGroups() {
                 <span class="stop-type-pill" style="background:${colorForType(stop.type)}20;color:${colorForType(stop.type)}">${escapeHtml(stop.type)}</span>
               </div>
               <div class="stop-meta">${escapeHtml(stop.timeNeeded)} · ${escapeHtml(stop.driveFromPrevious)}</div>
+              ${hoursHtml(stop)}
               <p class="stop-note">${escapeHtml(stop.notes)}</p>
               <div class="stop-links">
                 <a href="${stop.mapsUrl}" target="_blank" rel="noreferrer">Open in Google Maps</a>
