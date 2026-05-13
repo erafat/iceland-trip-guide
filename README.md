@@ -36,7 +36,7 @@ Static GitHub Pages site for the May 2-9, 2026 Iceland Ring Road itinerary.
 ## Notes
 - Geocoding is a build-time step only.
 - Weather is a build-time step only.
-- `.github/workflows/weather.yml` refreshes `data/weather.json` daily at 06:15 UTC and commits the updated snapshot when the GitHub secret `METEOBLUE_API_KEY` is available. Set `METEOBLUE_SHARED_SECRET` too if the key requires signed requests.
+- `.github/workflows/weather.yml` can be run manually to refresh `data/weather.json` and commit the updated snapshot when the GitHub secret `METEOBLUE_API_KEY` is available. Set `METEOBLUE_SHARED_SECRET` too if the key requires signed requests.
 - The browser never calls the geocoder directly.
 - The browser never calls Meteoblue directly.
 - The map uses OpenStreetMap tiles and keeps visible attribution.
